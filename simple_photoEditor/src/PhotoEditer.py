@@ -33,7 +33,6 @@ class PhotoEdit:
         """
         # Rotate the image
         image = self.image.rotate(rotation_angle)
-
         return image
 
     def resize_image(self, size: tuple):
@@ -49,16 +48,15 @@ class PhotoEdit:
         """
         # Resize the image
         image = self.image.resize(size=size)
-
         return image
 
-    def enhanceImage(self, enhancerFactor: int):
+    def enhance_image(self, enhancer_factor: int):
         """
         Enhance the image by applying a contrast filter, converting to grayscale,
         and rotating the image.
 
         Args:
-            enhancerFactor (int): The factor by which to enhance the contrast.
+            enhancer_factor (int): The factor by which to enhance the contrast.
 
         Returns:
             PIL.Image.Image: The enhanced image.
@@ -74,22 +72,83 @@ class PhotoEdit:
 
         # Enhance the contrast of the image
         enhancer = ImageEnhance.Contrast(image)
-        image = enhancer.enhance(factor=enhancerFactor)
+        image = enhancer.enhance(factor=enhancer_factor)
 
         return image
 
-    def save_image(self, image):
+    def adjust_brightness(self, brightness_factor: float):
+        """
+        Adjust the brightness of the image.
+
+        Args:
+            brightness_factor (float): The factor by which to adjust the brightness.
+
+        Returns:
+            PIL.Image.Image: The image with adjusted brightness.
+        """
+        enhancer = ImageEnhance.Brightness(self.image)
+        image = enhancer.enhance(brightness_factor)
+        return image
+
+    def adjust_contrast(self, contrast_factor: float):
+        """
+        Adjust the contrast of the image.
+
+        Args:
+            contrast_factor (float): The factor by which to adjust the contrast.
+
+        Returns:
+            PIL.Image.Image: The image with adjusted contrast.
+        """
+        enhancer = ImageEnhance.Contrast(self.image)
+        image = enhancer.enhance(contrast_factor)
+        return image
+
+    def adjust_sharpness(self, sharpness_factor: float):
+        """
+        Adjust the sharpness of the image.
+
+        Args:
+            sharpness_factor (float): The factor by which to adjust the sharpness.
+
+        Returns:
+            PIL.Image.Image: The image with adjusted sharpness.
+        """
+        enhancer = ImageEnhance.Sharpness(self.image)
+        image = enhancer.enhance(sharpness_factor)
+        return image
+
+    def flip_image(self, direction: str):
+        """
+        Flip the image horizontally or vertically.
+
+        Args:
+            direction (str): The direction to flip the image ('horizontal' or 'vertical').
+
+        Returns:
+            PIL.Image.Image: The flipped image.
+        """
+        if direction == "horizontal":
+            image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
+        elif direction == "vertical":
+            image = self.image.transpose(Image.FLIP_TOP_BOTTOM)
+        else:
+            raise ValueError("Direction must be 'horizontal' or 'vertical'")
+        return image
+
+    def save_image(self, image, suffix="_edited"):
         """
         Save the edited image to the specified save path.
 
         Args:
             image (PIL.Image.Image): The edited image to save.
+            suffix (str): Suffix to append to the saved image file name.
         """
         # Get the cleaned image name by extracting the file name from the image path
         clean_name = os.path.splitext(os.path.basename(self.img_path))[0]
 
-        # Save the edited image with the cleaned name and "_edited" suffix
-        image.save(f"{self.img_save_path}/{clean_name}_edited.jpg")
+        # Save the edited image with the cleaned name and provided suffix
+        image.save(f"{self.img_save_path}/{clean_name}{suffix}.jpg")
 
 
 if __name__ == "__main__":
@@ -100,6 +159,10 @@ if __name__ == "__main__":
     )
     image = edit_photo.rotate_image(rotation_angle=20)
     image = edit_photo.resize_image(size=(200, 200))
-    image = edit_photo.enhanceImage(enhancerFactor=5)
+    image = edit_photo.enhance_image(enhancer_factor=5)
+    image = edit_photo.adjust_brightness(brightness_factor=1.2)
+    image = edit_photo.adjust_contrast(contrast_factor=1.5)
+    image = edit_photo.adjust_sharpness(sharpness_factor=2.0)
+    image = edit_photo.flip_image(direction="horizontal")
 
     edit_photo.save_image(image=image)
